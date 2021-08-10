@@ -4,17 +4,14 @@ params.WD = "trX_assembly"
 params.sample_file = "metadata.tsv"
 params.SILVA = "${DB_REF}/SILVA/SILVA.fasta"
 params.sortmerna_dir = "${DB_REF}/SortMeRNA"
-params.m_mem = 4
-params.h_mem = 15
-params.ltp_cores = 1
-params.mtp_cores = 2
-params.htp_cores = 4
+
 
 
 
 include{ubam2fastq; fastqc_SE; multiqc; trimmomatic_SE; fix_ReadName} from './nf-lib/raw_reads.nf'
 include{sortmerRNA_SE} from './nf-lib/db_algos.nf'
 include{Trinity_SE} from './nf-lib/assembly.nf'
+
 
 
 
@@ -54,21 +51,22 @@ workflow process_fastq{
 
 
 
-workflow{
+workflow {
 
 
         SILVA = Channel.value(params.SILVA)
         sortmerna_dir = Channel.value(params.sortmerna_dir)
         sample_file = Channel.fromPath(params.sample_file)
 	
-	BAM_files = Channel.fromPath("./*.bam", checkIfExists: true)
+	BAM_files = Channel.fromPath("./BAM/*.bam", checkIfExists: true)
 	get_fastq(BAM_files)
 	process_fastq(get_fastq.out)
 	sortmerRNA_SE(process_fastq.out, SILVA)
 	fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
-	Trinity_SE(fix_ReadName.out.collect(), sample_file) 
+	//Trinity_SE(fix_ReadName.out.collect(), sample_file) 
 
 }
+
 
 
 
