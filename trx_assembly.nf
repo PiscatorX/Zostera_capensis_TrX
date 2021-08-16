@@ -63,7 +63,7 @@ workflow {
 	process_fastq(get_fastq.out)
 	sortmerRNA_SE(process_fastq.out, SILVA)
 	fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
-	//Trinity_SE(fix_ReadName.out.collect(), sample_file) 
+	Trinity_SE(fix_ReadName.out.collect(), sample_file) 
 
 }
 
