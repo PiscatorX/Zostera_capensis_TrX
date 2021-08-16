@@ -1,18 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
-params.WD = "trX_assembly"
-params.sample_file = "metadata.tsv"
-params.SILVA = "${DB_REF}/SILVA/SILVA.fasta"
-params.sortmerna_dir = "${DB_REF}/SortMeRNA"
-
 
 
 
 include{ubam2fastq; fastqc_SE; multiqc; trimmomatic_SE; fix_ReadName} from './nf-lib/raw_reads.nf'
 include{sortmerRNA_SE} from './nf-lib/db_algos.nf'
 include{Trinity_SE} from './nf-lib/assembly.nf'
-
-
 
 
 workflow get_fastq{
@@ -50,19 +43,19 @@ workflow process_fastq{
 
 
 
-
 workflow {
 
 
-        SILVA = Channel.value(params.SILVA)
-        sortmerna_dir = Channel.value(params.sortmerna_dir)
+	BAM_files = Channel.fromPath(params.raw_bams, checkIfExists: true) 
+        SortmeRNA_Reflist =  Channel.value(params.SortmeRNA_Reflist)
         sample_file = Channel.fromPath(params.sample_file)
 	
-	BAM_files = Channel.fromPath("./BAM/*.bam", checkIfExists: true)
 	get_fastq(BAM_files)
 	process_fastq(get_fastq.out)
-	sortmerRNA_SE(process_fastq.out, SILVA)
+	sortmerRNA_SE(process_fastq.out, SortmeRNA_Reflist)
 	fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
+	fastqc_SE(fix_ReadName.out, "SortmeRNA")
+	multiqc(fastqc_SE.out.collect(), "SortmeRNA")
 	Trinity_SE(fix_ReadName.out.collect(), sample_file) 
 
 }
