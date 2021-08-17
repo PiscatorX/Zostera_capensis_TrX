@@ -3,9 +3,9 @@ nextflow.enable.dsl=2
 
 
 
-include{ubam2fastq; fastqc_SE; multiqc; trimmomatic_SE; fix_ReadName} from 'nf-lib/raw_reads.nf'
-include{sortmerRNA_SE} from 'nf-lib/db_algos.nf'
-include{Trinity_SE} from 'nf-lib/assembly.nf'
+include{ubam2fastq; fastqc_SE; multiqc; trimmomatic_SE; fix_ReadName} from './nf-lib/raw_reads.nf'
+include{sortmerRNA_SE} from './nf-lib/db_algos.nf'
+include{Trinity_SE} from './nf-lib/assembly.nf'
 
 
 workflow get_fastq{
