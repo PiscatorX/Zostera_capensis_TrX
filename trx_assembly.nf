@@ -49,14 +49,15 @@ workflow {
 	BAM_files = Channel.fromPath(params.raw_bams, checkIfExists: true) 
         SortmeRNA_Reflist =  Channel.value(params.SortmeRNA_Reflist)
         sample_file = Channel.fromPath(params.sample_file)
-	
+	SortmeRNA_idx_dir = Channel.value(params.SortmeRNA_idx_dir)
+
 	get_fastq(BAM_files)
 	process_fastq(get_fastq.out)
-	sortmerRNA_SE(process_fastq.out, SortmeRNA_Reflist)
-	//fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
-	//fastqc_SE(fix_ReadName.out, "SortmeRNA")
-	//multiqc(fastqc_SE.out.collect(), "SortmeRNA")
-	//Trinity_SE(fix_ReadName.out.collect(), sample_file) 
+	sortmerRNA_SE(process_fastq.out, SortmeRNA_idx_dir, SortmeRNA_Reflist)
+	fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
+	fastqc_SE(fix_ReadName.out, "SortmeRNA")
+	multiqc(fastqc_SE.out.collect(), "SortmeRNA")
+	Trinity_SE(fix_ReadName.out.collect(), sample_file) 
 
 }
 
