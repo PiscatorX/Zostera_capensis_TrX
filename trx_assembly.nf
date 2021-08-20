@@ -53,10 +53,10 @@ workflow {
 	get_fastq(BAM_files)
 	process_fastq(get_fastq.out)
 	sortmerRNA_SE(process_fastq.out, SortmeRNA_Reflist)
-	fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
-	fastqc_SE(fix_ReadName.out, "SortmeRNA")
-	multiqc(fastqc_SE.out.collect(), "SortmeRNA")
-	Trinity_SE(fix_ReadName.out.collect(), sample_file) 
+	//fix_ReadName(sortmerRNA_SE.out.SE_mRNA_read)
+	//fastqc_SE(fix_ReadName.out, "SortmeRNA")
+	//multiqc(fastqc_SE.out.collect(), "SortmeRNA")
+	//Trinity_SE(fix_ReadName.out.collect(), sample_file) 
 
 }
 
