@@ -1,37 +1,46 @@
 #'miscellaneous functions that I use in data analysis
 
 
+#' Title
+#'
+#' @param multiqc_path 
+#' @param sel_col 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 summarise_multiqc <- function(multiqc_path, sel_col){
   
   #filters multiqc general stats files 
-  multiqc_dirs  <- list.dirs(multiqc_path)
-    
+  multiqc_dirs  <- Sys.glob(multiqc_path)
+  
   if (length(sel_col) != 1 ){
     stop("Only one filter column required")
   }
-
+  
   stats <- data.frame()
-    
+  
   for (sub_dir in multiqc_dirs){
     
     analysis <- basename(str_split_fixed(sub_dir ,"_", n = 2)[1])
     print(analysis)
-    fname <- file.path(sub_dir,"multiqc_general_stats.txt")  
+    fname <- file.path(sub_dir,"multiqc_general_stats.txt")
     tmp_df <- read.table(fname, sep = "\t", header = T, stringsAsFactors = F) %>%
       select(c("Sample"), !!sel_col)
     tmp_df$Sample <- str_replace(tmp_df$Sample,"trim_","")
     colnames(tmp_df)[2] <- analysis
     if (nrow(stats) != 0 ){
-      stats <- merge(tmp_df, stats) 
+      stats <- merge(tmp_df, stats)
     }
     else{
       stats <- data.frame(tmp_df)
     }
     
   } 
-
-return(stats)
-
+  
+  return(stats)
+  
 }
 
 
@@ -44,6 +53,41 @@ get_var <- function(var, data =trinity_stats){
 }
 
 
+
+#Bam file flagstat metrics
+summarise_bam_metrics <- function(flagstat_dir, var){
+  
+  flagstat_files  <-  list.files(flagstat_dir)
+  if (length(var) != 1 ){
+    stop("Only one filter row should be provided")
+  }
+  
+  flagstats <- data.frame()
+  for (flagstat_fname in flagstat_files){
+    tmp_df <- read.table(file.path(flagstat_dir, flagstat_fname), sep = "\t") %>%
+      select(V1, V3) %>% 
+      t() %>% 
+      data.frame(check.names  = F, stringsAsFactors = F )
+    colnames(tmp_df) <- unname(unlist(tmp_df[c("V3"),]))
+    tmp_df <- tmp_df %>%  filter(row.names(tmp_df)  %in%  c("V1"))
+    row.names(tmp_df) <- str_split(flagstat_fname, ".", n = 1)
+    
+    if (nrow(flagstats) != 0 ){
+      flagstats <- rbind(flagstats, tmp_df) 
+    }
+    else{
+      
+      flagstats <- data.frame(tmp_df, check.names  = F, stringsAsFactors = F )
+    }
+  } 
+  
+  myflagstat <- flagstats %>%
+    select({{var}})
+  
+  myflagstat[var] <- as.numeric(myflagstat[[var]])
+  
+  return(myflagstat)
+}
 
 
 # plot_dispersion <- function(dds, plot_fname ="DispEsts.tiff"){
