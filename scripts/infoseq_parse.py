@@ -12,6 +12,3 @@ for row in data:
     row['USA']  = USA.split(":")[2]
     _  = [ row.pop(k, None) for k in  ['Database', 'Name', 'Accession', 'Type', '%GC', 'Organism', 'Description' ]]
     csv_writer.writerow(row)
-    if i == 10:
-        break
-    i += 1
