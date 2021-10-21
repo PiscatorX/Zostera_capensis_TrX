@@ -19,7 +19,7 @@ workflow{
      
      bt2_index_path =  Channel.value(params.bowtie_path)
      bowtie2_build(denovo_ref, bt2_index_path)
-     bowtie2_SE(SE_reads, denovo_ref, bt2_index_path)
+     bowtie2_SE(SE_reads, denovo_ref, bowtie2_build.out.bt2_index_path)
      bam_flagstat(bowtie2_SE.out.BAM)
 
      infoseq(SE_reads)
