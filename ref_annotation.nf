@@ -8,9 +8,8 @@ swissprot = "${DB_REF}/SwissProt/uniprot_sprot.fasta"
 swissprot_path = "${DB_REF}/BLAST/SwissProt/"
 PfamA_hmm =  "${DB_REF}/Pfam/Pfam-A.hmm"
 mol_type = "prot"
-//e_value = "1e-5"
-e_value = "100"
-min_len = 10
+e_value = "1e-5"
+min_len = 100
 
 include{makeBlastDB; blast_tophit; hmmscan} from './nf-lib/db_algos.nf'
 include{transdecoder} from './nf-lib/prediction_algos.nf'
