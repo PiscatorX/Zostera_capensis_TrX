@@ -115,102 +115,98 @@ summarise_bam_metrics <- function(flagstat_dir, var){
 
 
 
-
-# plot_MA<- function(dds_results, plot_fname="MAplot.tiff"){
+plot_MA<- function(dds_results, plot_fname="MAplot.tiff"){
   
-#   if(interactive()){
+   if(interactive()){
     
-#    plotMA(dds_results)
+    plotMA(dds_results)
+       }  
+  
+   pdf(plot_fname,
+        width = 180,
+        heigh= 180)
+  
+   plotMA(dds_results)
+  
+   dev.off()
+  
+}
+
+
+
+
+
+
+plot_volcano_p <- function(dds_results, plot_fname ="EnhancedVolcano.tiff", x_xlim = -5, y_xlim = 8){
+  
+  p <-  EnhancedVolcano(dds_results,
+                        lab = rownames(dds_results),
+                        x = 'log2FoldChange',
+                        y = 'pvalue',
+                        xlim = c(x_xlim, y_xlim))
+  
+  if(interactive()){
     
-#   }  
-  
-#   tiff(plot_fname,
-#        width = 180,
-#        heigh= 180,
-#        units = "mm",
-#        res = 1000,
-#        compression = "lzw")
-  
-#   plotMA(dds_results)
-  
-#   dev.off()
-  
-# }
-
-
-
-
-
-
-# plot_volcano_p <- function(dds_results, plot_fname ="EnhancedVolcano.tiff", x_xlim = -5, y_xlim = 8){
-  
-#   p <-  EnhancedVolcano(dds_results,
-#                         lab = rownames(dds_results),
-#                         x = 'log2FoldChange',
-#                         y = 'pvalue',
-#                         xlim = c(x_xlim, y_xlim))
-  
-#   if(interactive()){
+    print(p) 
     
-#     print(p) 
-    
-#   }  
+  }  
   
-#   tiff(plot_fname,
-#        width = 180,
-#        heigh= 180,
-#        units = "mm",
-#        res = 1000,
-#        compression = "lzw")
+  tiff(plot_fname,
+       width = 180,
+       heigh= 180,
+       units = "mm",
+       res = 1000,
+       compression = "lzw")
   
-#   print(p) 
+  print(p) 
   
-#   dev.off()
+  dev.off()
   
-#  return(p)  
-# }
+ return(p)  
+}
 
-# plot_volcano_padj <- function(dds_results, plot_fname ="EnhancedVolcano_padj.tiff"){
+plot_volcano_padj <- function(dds_results, plot_fname ="EnhancedVolcano_padj.tiff"){
   
 
-#   p <- EnhancedVolcano(dds_results,
-#                        lab = rownames(dds_results),
-#                        x = 'log2FoldChange',
-#                        y = 'padj',
-#                        xlim=c(-6,6),
-#                        xlab = bquote(~Log[2]~ 'fold change'),
-#                        ylab = bquote(~-Log[10]~adjusted~italic(P)),
-#                        pCutoff = 0.001,
-#                        FCcutoff = 0,
-#                        transcriptLabSize = 4.0,
-#                        colAlpha = 1,
-#                        legend=c('NS','Log2 FC','Adjusted p-value',
-#                                 'Adjusted p-value & Log2 FC'),
-#                        legendPosition = 'bottom',
-#                        legendLabSize = 10,
-#                        legendIconSize = 3.0)
+  p <- EnhancedVolcano(dds_results,
+                       lab = rownames(dds_results),
+                       x = 'log2FoldChange',
+                       y = 'padj',
+                       xlim=c(-6,6),
+                       xlab = bquote(~Log[2]~ 'fold change'),
+                       ylab = bquote(~-Log[10]~adjusted~italic(P)),
+                       pCutoff = 0.001,
+                       FCcutoff = 0,
+                       transcriptLabSize = 4.0,
+                       colAlpha = 1,
+                       legend=c('NS','Log2 FC','Adjusted p-value',
+                                'Adjusted p-value & Log2 FC'),
+                       legendPosition = 'bottom',
+                       legendLabSize = 10,
+                       legendIconSize = 3.0)
   
-#   if(interactive()){
+  if(interactive()){
     
-#     print(p) 
+    print(p) 
     
-#   }  
+  }  
   
   
   
-#   tiff(plot_fname,
-#        width = 180,
-#        heigh= 180,
-#        units = "mm",
-#        res = 1000,
-#        compression = "lzw")
+  tiff(plot_fname,
+       width = 180,
+       heigh= 180,
+       units = "mm",
+       res = 1000,
+       compression = "lzw")
   
-#   print(p) 
+  print(p) 
   
-#   dev.off()
+  dev.off()
   
-#  return(p) 
-# }
+ return(p) 
+
+}
 
 # subset_dds  <- function(dds_results, variable="pvalue", value=0.05, tsv_fname="resOrdered.tsv"){
   
@@ -288,34 +284,34 @@ summarise_bam_metrics <- function(flagstat_dir, var){
 
 
 
-# #' @param my_dataframe Dataframe with samples(row) x measurements(columns)
-# #' @return mypca object list of `pca` and `var_perc` 
+#' @param my_dataframe Dataframe with samples(row) x measurements(columns)
+#' @return mypca object list of `pca` and `var_perc` 
 
-# do_mypca  <- function(my_dataframe, scale = TRUE){
+do_mypca  <- function(my_dataframe, scale = TRUE){
 
 
 
-# print(my_dataframe)
+print(my_dataframe)
 
-# pca <-  prcomp(my_dataframe,  scale = scale)
-# print(pca)
-# pca_var <- pca$sdev^2
-# pca_var_perc <- round(pca_var/sum(pca_var)*100,1)
-# print(pca$x)
-# pca_data <- data.frame(Sample=rownames(pca$x),
-#                         PC1=pca$x[,1],
-#                         PC2=pca$x[,2])
-# PC <- paste0("PC", c(1: length(pca_var_perc)))
-# var_perc <- data.frame(PC, pca_var_perc)
-# print(var_perc)
+pca <-  prcomp(my_dataframe,  scale = scale)
+print(pca)
+pca_var <- pca$sdev^2
+pca_var_perc <- round(pca_var/sum(pca_var)*100,1)
+print(pca$x)
+pca_data <- data.frame(Sample=rownames(pca$x),
+                        PC1=pca$x[,1],
+                        PC2=pca$x[,2])
+PC <- paste0("PC", c(1: length(pca_var_perc)))
+var_perc <- data.frame(PC, pca_var_perc)
+print(var_perc)
  
-# mypca <- list()
-# mypca$pca <- pca
-# mypca$var_perc <- var_perc
-# mypca$pca_data <- pca_data
-# return(mypca)
+mypca <- list()
+mypca$pca <- pca
+mypca$var_perc <- var_perc
+mypca$pca_data <- pca_data
+return(mypca)
 
-# }
+}
 
 
 
@@ -380,49 +376,49 @@ summarise_bam_metrics <- function(flagstat_dir, var){
 
 
 
-# mypca_plot<- function(mypca, 
-#                       pca_data_index="pca_data", 
-#                       name = "Sample",
-#                       label="Sample", 
-#                       var_perc_index="var_perc",
-#                       plot_fname="PCAplot.tiff"){
+mypca_plot<- function(mypca, 
+                      pca_data_index="pca_data", 
+                      name = "Sample",
+                      label="Sample", 
+                      var_perc_index="var_perc",
+                      plot_fname="PCAplot.tiff"){
  
-# pca_data <- mypca[[pca_data_index]]
-# var_perc <- mypca[[var_perc_index]]
-# my_colors <- colorRampPalette(c("red","blue"))(length(levels(mypca$pca_data[[label]])))
+pca_data <- mypca[[pca_data_index]]
+var_perc <- mypca[[var_perc_index]]
+my_colors <- colorRampPalette(c("red","blue"))(length(levels(mypca$pca_data[[label]])))
 
    
-# p <- ggplot(data=mypca$pca_data, aes_string(x="PC1", y="PC2", label=label, color = label)) +
-#             geom_label_repel(show.legend = FALSE, size=6)  +
-#             geom_point(size=3) +
-#             xlab(paste("PC1: ", var_perc[1], "% variance", sep="")) +
-#             ylab(paste("PC2: ", var_perc[2], "% variance", sep="")) +
-#             theme_bw() +
-#             theme(axis.text=element_text(size=16),
-#                   axis.title=element_text(size=18, face = "bold"),
-#                   strip.text.x = element_text(size = 14, face = "bold"),
-#                   axis.text.x = element_text(size = 14),
-#                   legend.text = element_text(size = 12),
-#                   legend.title = element_text(size = 14, face = "bold"),
-#                   panel.grid = element_blank(),
-#                   panel.grid.major = element_line(size=0.1)) + 
-#             scale_color_manual(values=my_colors, name=name)
+p <- ggplot(data=mypca$pca_data, aes_string(x="PC1", y="PC2", label=label, color = label)) +
+            geom_label_repel(show.legend = FALSE, size=4)  +
+            geom_point(size=1) +
+            xlab(paste("PC1: ", var_perc[1], "% variance", sep="")) +
+            ylab(paste("PC2: ", var_perc[2], "% variance", sep="")) +
+            theme_bw() +
+            theme(axis.text=element_text(size=16),
+                  axis.title=element_text(size=18, face = "bold"),
+                  strip.text.x = element_text(size = 14, face = "bold"),
+                  axis.text.x = element_text(size = 14),
+                  legend.text = element_text(size = 12),
+                  legend.title = element_text(size = 14, face = "bold"),
+                  panel.grid = element_blank(),
+                  panel.grid.major = element_line(size=0.1)) + 
+            scale_color_manual(values=my_colors, name=name)
 
-#   if(interactive()){
-#     print(p)  
-#   }
+  if(interactive()){
+    print(p)  
+  }
   
 
-# ggsave(plot_fname,
-#        width = 180,
-#        heigh= 180,
-#        units = "mm",
-#        dpi = 1000,
-#        compression = "lzw")
+ggsave(plot_fname,
+       width = 180,
+       heigh= 180,
+       units = "mm",
+       dpi = 1000,
+       compression = "lzw")
 
-# return(p)
+return(p)
 
-# }
+}
 
 # #' @param StHelena_Bay_CTD ctd dataframe
 # #' @param depth depth at which to extract data
