@@ -94,5 +94,5 @@ if __name__ == '__main__':
     parser.add_argument('-f','--fix-id', dest = "fix_id", action="store_true", help ='remove description from fasta def line')
     parser.add_argument('-o','--outfile', help = "Output filename for fixed contig and tsv filename", required = True)
     args = parser.parse_args()   
-    db_connect = DB_Connect(args.contigs, args.db_name, outfile=args.outfile)
+    db_connect = DB_Connect(args.db_name, args.contigs,  outfile=args.outfile)
     db_connect.get_contig() 

@@ -2,7 +2,7 @@ library(gridExtra)
 library(tidyverse)
 library(docstring)
 library(xfun)
-
+library(xtable)
 
 
 source("/home/drewx/Documents/Zostera_capensis_TrX/scripts/Xpression_funcs.R")
@@ -13,69 +13,73 @@ fastqc_data <- summarise_multiqc("data/multiqc/*data", "FastQC_total_sequences")
 dput(colnames(fastqc_data))
 (fastqc_data <- fastqc_data[c("Sample", "RawReads", "Trimmomatic", "SortmeRNA")])
 (rawread_total <- sum(fastqc_data$RawReads))
-(rawread_len_avg <- NA) 
 
+
+#Raw length distribution
+#rawread_len <- read.table("data.enterprise/infoseq/len.dist", sep = "\t", header = T, stringsAsFactors = F)
+#save(rawread_len,file="data.enterprise/infoseq/rawread_len.Rda")
+load("data.enterprise/infoseq/rawread_len.Rda")
+(rawread_len_avg <- mean(rawread_len$Length))
+summary(rawread_len$Length)
+
+rawdata_len <- summarise_multiqc("data/multiqc/*data", "FastQC_avg_sequence_length")
+summary(rawdata_len$RawReads)
+
+sum(rawdata_len$RawReads)
+
+summary(rawdata_len$SortmeRNA)
+
+(readsums <- colSums(fastqc_data[c("RawReads","Trimmomatic","SortmeRNA")]))
+
+(readsums/67780422)
 
 #Sortmerna reads
 (filtered_total <- sum(fastqc_data$SortmeRNA))
-filtered_read_len <- read.table("data/infoseq/merged_infoseq_len.tsv", sep = "\t", header = T, stringsAsFactors = F)
+#filtered_read_len <- read.table("data/infoseq/merged_infoseq.tsv", sep = "\t", header = T, stringsAsFactors = F)
+#save(filtered_read_len,file="data/infoseq/filtered_read_len.Rda")
+load("data/infoseq/filtered_read_len.Rda")
+read_len <- filtered_read_len %>%
+            group_by(Length) %>% 
+            summarise(Count = n())
+
 (filtered_readlen_avg <- mean(filtered_read_len$Length))
 (filtered_total <- nrow(filtered_read_len))
 (filtered_readlen_min <- min(filtered_read_len$Length))
 (filtered_readln_max <- max(filtered_read_len$Length))
 
 #Assembly stats
-trinity_stats <- read.table("data/Assembly.stats", sep = ":", comment.char = '#' , stringsAsFactors = F, strip.white = T) %>%
+evigene_stats <- read.table("data.enterprise/Evigene_alt.assembly_stats", sep = ":", comment.char = '#' , stringsAsFactors = F, strip.white = T) %>%
                 `colnames<-`(c("Var", "value"))
 
 
 #BAM mapping stats
-(samtools_flagstat <- summarise_bam_metrics("data/bam_flagstats","mapped"))
-(total_mapped <- sum(samtools_flagstat$mapped))
+(samtools_flagstatx <- summarise_bam_metrics("data.enterprise//bam_flagstats","mapped"))
+(total_mappedx <- sum(samtools_flagstatx$mapped))
 
 fastqc_data$Sample <- str_split_fixed(fastqc_data$Sample, "_r", n = 2)[,1]
 
-(mapped_reads <- samtools_flagstat %>%
+(mapped_readsx <- samtools_flagstatx %>%
                 rownames_to_column(var = "Sample"))
 
-mapped_reads$Sample <- str_split_fixed(mapped_reads$Sample, "_r", n = 2)[,1]
+mapped_readsx$Sample <- str_split_fixed(mapped_readsx$Sample, "_r", n = 2)[,1]
 
-(read_filtering <- merge(fastqc_data, mapped_reads, by = "Sample"))
+(read_filteringx <- merge(fastqc_data, mapped_readsx, by = "Sample"))
 
-
-{Feature <- c("Total sequencing reads (SE)",
-"Read length avg. (bp)",
-"Total quality filtered reads",
-"Quality filtered read length avg. (bp)",
-"Total Transcripts",
-"Total genes",
-"Transcript contig length avg.",
-"Transcript N50 (bp)",
-"Transcript Nx50",
-"Percent GC",
-"Total SE reads mapping to assembly",
-"% reads mapping to assembly")}
+100 *  round(sum(read_filteringx$mapped)/sum(read_filteringx$SortmeRNA),1)
 
 
-Values = c(rawread_total,
-rawread_len_avg,
-filtered_total,
-filtered_readlen_avg,
-get_var("Total trinity transcripts"),
-get_var("Total trinity genes"),
-get_var("Average contig")[1],
-get_var("Contig N50")[1],
-NA,
-get_var("Percent GC"),
-total_mapped,
-(total_mapped/filtered_total) * 100)
+(read_filteringx$mapping_rate <-  round(100*(read_filteringx$mapped/read_filteringx$SortmeRNA),1))
 
-(Data_Table =  data.frame(Feature = Feature, Values = Values))
+print(xtable(read_filteringx, digits=7, type = "latex"), file = "SuppInfoX/read_filtering.tex", include.rownames = F)
 
-  
 
-# filtered_data %>%
-#     group_by(USA) %>%
-#     summarise(mean_len =  mean(Length), max_len = max(Length), min_len = min(Length))
+################################################################################
 
+data <-  read.table("SuppInfoX/fastqc_sequence_length_distribution_plot.tsv", sep = "\t", header = T, check.names = F)
+
+cnames <- colnames(data)
+
+colnames(data) <-NULL
+
+data.frame(t(data))
 

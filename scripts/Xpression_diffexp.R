@@ -10,6 +10,7 @@ library(pheatmap)
 library(tximeta)
 library(DESeq2)
 library(xtable)
+library(ggpubr)
 
 
 register(MulticoreParam(4))
@@ -55,7 +56,7 @@ mypca <- list()
 mypca$pca_data <- plotPCA(dds_vst, intgroup ="Treatment", returnData=TRUE)
 mypca$var_perc <- round(100 * attr(mypca$pca_data, "percentVar"))
 mypca$pca_data$name <- factor(c("Control_rep1", "Control_rep2", "Control_rep3", "Heat_stressed_rep1", "Heat_stressed_rep2","Heat_stressed_rep3"))
-px3 <- mypca_plot(mypca, label="name", plot_fname = "PCAplot.pdf")
+px3 <- mypca_plot(mypca, label="name", plot_fname = "FiguresX/PCAplot.pdf")
 
 
 ############ significant DE analysis ###########################################
@@ -82,6 +83,38 @@ return(res_sig)
 }
 
 (sig_genes1 <- signf_genes(padj_cutoff =  0.05))
+
+
+
+################################### DEG ########################################
+
+Regulation_ref <- sig_genes1 %>%
+              mutate(DEG = ifelse(log2FoldChange >  0, "Upregulated","Downregulated")) 
+
+write.table(Regulation_ref, file = "data.enterprise/Blast_top_hits/Regulation_ref.tsv", row.names = FALSE, quote = FALSE, sep ="\t", col.names = T)
+
+Regulation <- Regulation_ref %>%
+              group_by(DEG) %>%
+              summarise(count = n())
+
+
+
+ggbarplot(Regulation, x = "DEG", y = "count",
+          fill = "DEG",               
+          palette = "simpsons",
+          ylab = "Differentially expressed",
+          xlab = "Response",
+          label = T,
+          width = 1,
+          lab.size = 6,
+          lab.hjust = -0.25,
+          lab.vjust = 0.25,
+          orientation = "horiz") + theme(panel.border = element_rect(colour = "black", fill=NA, size=0.5),
+          legend.background = element_rect(colour = "black", fill=NA, size=0.5))
+
+ggsave("FiguresX/RegulationX.pdf", height = 50 , width = 180, units = "mm")
+
+
 colnames(sig_genes1)
 colnames(uniprot_ref)
 dim(sig_genes1)
