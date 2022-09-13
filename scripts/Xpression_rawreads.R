@@ -42,6 +42,7 @@ read_len <- filtered_read_len %>%
             group_by(Length) %>% 
             summarise(Count = n())
 
+summary(filtered_read_len)
 (filtered_readlen_avg <- mean(filtered_read_len$Length))
 (filtered_total <- nrow(filtered_read_len))
 (filtered_readlen_min <- min(filtered_read_len$Length))
